@@ -4,21 +4,13 @@
 
 ## 🎯 What This Is
 
-A hosted learning platform where your leadership team can:
+A hosted learning platform where your team can:
 - Sign in with company Google accounts (@2base.tech)
 - Complete the 10-day Claude mastery program
 - Track progress automatically (syncs across devices)
 - View team progress in real-time admin dashboard
 
-## 📦 Two Versions Available
 
-### Version 1: Standalone (Original)
-- Local progress tracking (browser localStorage)
-- No login required
-- Perfect for individual use
-- Files: `2base-claude-leadership-training.jsx` + `main.jsx`
-
-### Version 2: Firebase Portal (This Version)
 - ✅ Google SSO authentication
 - ✅ Cloud progress sync
 - ✅ Admin dashboard for team tracking
@@ -28,7 +20,7 @@ A hosted learning platform where your leadership team can:
 
 ---
 
-## 🚀 Quick Start (Firebase Version)
+## 🚀 Quick Start 
 
 ### Prerequisites
 - Node.js 18+ installed
@@ -153,7 +145,7 @@ npm run build
 ├── firebase-app.jsx              # Main React app with Firebase
 ├── index.html                    # HTML entry point
 ├── main.jsx                      # React mount (update to use firebase-app.jsx)
-├── package-firebase.json         # Dependencies with Firebase
+├── package.json         # Dependencies with Firebase
 ├── vite.config.js                # Vite configuration
 ├── storage-shim.js               # Legacy localStorage shim (not used in Firebase version)
 ├── FIREBASE_SETUP.md             # Complete Firebase setup guide
