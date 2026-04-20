@@ -1,7 +1,7 @@
 {
-  "name": "2base-claude-leadership-training-firebase",
+  "name": "2base-claude-training-firebase",
   "version": "2.0.0",
-  "description": "A 10-day intensive learning program for 2Base Technologies leadership with Firebase authentication and cloud progress tracking.",
+  "description": "A 10-day intensive learning program with Firebase authentication and cloud progress tracking.",
   "type": "module",
   "scripts": {
     "dev": "vite",
