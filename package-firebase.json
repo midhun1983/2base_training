@@ -1,0 +1,23 @@
+{
+  "name": "2base-claude-leadership-training-firebase",
+  "version": "2.0.0",
+  "description": "A 10-day intensive learning program for 2Base Technologies leadership with Firebase authentication and cloud progress tracking.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": ["claude", "ai-training", "leadership", "firebase"],
+  "author": "2Base Technologies",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "firebase": "^11.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.1",
+    "vite": "^8.0.8"
+  }
+}
