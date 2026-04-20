@@ -399,7 +399,7 @@ function LoginScreen({ onLogin }) {
             src="/2base-logo.png" 
             alt="2Base Technologies"
             style={{ 
-              height: 50,
+              height: 60,
               width: "auto",
               margin: "0 auto 20px",
               display: "block"
