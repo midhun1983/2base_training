@@ -798,7 +798,7 @@ export default function ClaudeLearningPlan2BaseFirebase() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <h1 style={{ fontSize: 26, fontWeight: 600, margin: "0 0 6px", letterSpacing: -0.5 }}>Claude Mastery for 2Base</h1>
-            <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: 0, fontWeight: 400 }}>Self-paced · BA · QA · Delivery · P&C · DevSecOps</p>
+            <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: 0, fontWeight: 400 }}>Master Claude for daily workflows and strategic decisions</p>
           </div>
           <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <ProgressRing percent={overallPercent} size={56} stroke={5} color="#2EAD6B" />
