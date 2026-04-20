@@ -24,6 +24,7 @@ const ALLOWED_DOMAIN = "2basetechnologies.com"; // Change to your company domain
 // Admin emails - ONLY these users can access admin dashboard
 const ADMIN_EMAILS = [
   "midhun@2basetechnologies.com",
+  "nidhin@2basetechnologies.com",
   // Add more admin emails here
 ];
 
@@ -39,9 +40,9 @@ const DAYS = [
         title: "Understanding Claude vs ChatGPT",
         reading: [
           { text: "Learn what makes Claude different: longer context (200K tokens), better instruction following, artifacts for work products, computer use for web tasks", url: "https://docs.anthropic.com/en/docs/overview" },
-          { text: "Understand Claude's strengths over ChatGPT: analysis depth, document handling, code generation, structured output, safety guardrails", url: null },
-          { text: "Study the Claude interface: conversations, Projects, artifacts, voice mode, citations with search", url: null },
-          { text: "Learn about Claude models: Opus (complex reasoning), Sonnet (balanced), Haiku (speed) and when to use each", url: null },
+          { text: "Understand Claude's strengths over ChatGPT: analysis depth, document handling, code generation, structured output, safety guardrails", url: "https://docs.anthropic.com/en/docs/about-claude/overview" },
+          { text: "Study the Claude interface: conversations, Projects, artifacts, voice mode, citations with search", url: "https://support.anthropic.com/en/collections/4078534-using-claude" },
+          { text: "Learn about Claude models: Opus (complex reasoning), Sonnet (balanced), Haiku (speed) and when to use each", url: "https://docs.anthropic.com/en/docs/about-claude/models" },
         ],
         project: "Create a comparison table documenting 10 common ChatGPT prompts you use. Rewrite each for Claude and test the quality difference. Document what works better and why.",
         skills: ["Model comparison", "Migration strategy", "Feature awareness"],
@@ -51,9 +52,9 @@ const DAYS = [
         title: "Prompt Engineering for Claude",
         reading: [
           { text: "Master the anatomy of Claude prompts: role, context, task, format, constraints, examples (XML tags for structure)", url: "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" },
-          { text: "Learn Claude-specific techniques: chain-of-thought prompting, prefill for format control, system prompts in Projects", url: null },
+          { text: "Learn Claude-specific techniques: chain-of-thought prompting, prefill for format control, system prompts in Projects", url: "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/chain-prompts" },
           { text: "Practice specificity: 'Analyze this code' vs 'You are a senior QA engineer. Review this Python function for edge cases, error handling, and test coverage. Output findings as a table with severity ratings'", url: null },
-          { text: "Understand output formatting: markdown tables, JSON, XML, numbered lists, code blocks with syntax highlighting", url: null },
+          { text: "Understand output formatting: markdown tables, JSON, XML, numbered lists, code blocks with syntax highlighting", url: "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/prompt-generator" },
         ],
         project: "Write 15 domain-specific prompts for your role (BA: requirements analysis, QA: test planning, Delivery: project reporting, P&C: interview guides). Test each and iterate to 5-star quality.",
         skills: ["Prompt engineering", "Output formatting", "Role-specific templating"],
@@ -70,7 +71,7 @@ const DAYS = [
         session: "morning",
         title: "Setting Up Claude Projects",
         reading: [
-          { text: "Learn Claude Projects: persistent workspaces with uploaded docs, custom instructions, conversation history, and memory", url: "https://docs.claude.com" },
+          { text: "Learn Claude Projects: persistent workspaces with uploaded docs, custom instructions, conversation history, and memory", url: "https://support.anthropic.com/en/articles/9517075-what-are-projects" },
           { text: "Study how to structure Projects: one per major domain (QA standards, delivery templates, BA frameworks, P&C policies)", url: null },
           { text: "Practice uploading team documents: SOPs, templates, style guides, process docs, coding standards, quality rubrics", url: null },
           { text: "Understand Project custom instructions: pre-loading context so Claude always responds with your team's standards", url: null },
@@ -102,7 +103,7 @@ const DAYS = [
         session: "morning",
         title: "Artifacts for Work Products",
         reading: [
-          { text: "Learn artifacts: Claude creates interactive work products (documents, code, charts, diagrams) in a reusable sidebar", url: null },
+          { text: "Learn artifacts: Claude creates interactive work products (documents, code, charts, diagrams) in a reusable sidebar", url: "https://support.anthropic.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them" },
           { text: "Practice creating artifacts: 'Create a requirements template with all sections', 'Build a test case matrix for this feature', 'Generate a project status dashboard'", url: null },
           { text: "Study how to iterate artifacts: Claude can edit, extend, and refine artifacts across multiple prompts", url: null },
           { text: "Understand artifact types: documents (markdown), code (React, Python, etc), SVG diagrams, Mermaid charts, interactive HTML", url: null },
@@ -114,7 +115,7 @@ const DAYS = [
         session: "afternoon",
         title: "Claude Computer Use (Advanced)",
         reading: [
-          { text: "Learn Claude's computer use: it can browse websites, fill forms, interact with web apps, extract data from live sites", url: null },
+          { text: "Learn Claude's computer use: it can browse websites, fill forms, interact with web apps, extract data from live sites", url: "https://docs.anthropic.com/en/docs/build-with-claude/computer-use" },
           { text: "Practice web research tasks: 'Find the top 10 competitor products and build a comparison table with pricing, features, and reviews'", url: null },
           { text: "Study Claude's limitations: cannot access internal systems, requires public URLs, works best with well-structured sites", url: null },
           { text: "Understand safety: always review before Claude submits forms, approves transactions, or shares data", url: null },
@@ -295,9 +296,9 @@ const DAYS = [
         title: "Advanced Prompting & Chaining",
         reading: [
           { text: "Learn multi-step prompt chains: Step 1 → analyze data, Step 2 → identify patterns, Step 3 → generate recommendations, Step 4 → create action plan", url: "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/chain-of-thought" },
-          { text: "Practice XML-tagged prompts for structure: <context>, <task>, <format>, <constraints>, <examples> for precise control", url: null },
-          { text: "Study prefill technique: start Claude's response for format enforcement ('Here is the analysis table:\\n| Metric | Value | Change |')", url: null },
-          { text: "Understand system prompts in Projects: persistent instructions that apply to every conversation in that Project", url: null },
+          { text: "Practice XML-tagged prompts for structure: <context>, <task>, <format>, <constraints>, <examples> for precise control", url: "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags" },
+          { text: "Study prefill technique: start Claude's response for format enforcement ('Here is the analysis table:\\n| Metric | Value | Change |')", url: "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/prefill-claudes-response" },
+          { text: "Understand system prompts in Projects: persistent instructions that apply to every conversation in that Project", url: "https://support.anthropic.com/en/articles/9517075-what-are-projects#h_e7a4e4cf2b" },
         ],
         project: "Build a 5-step prompt chain for a complex workflow in your domain (sprint planning, release readiness, requirements validation, etc). Test end-to-end and measure quality vs manual approach.",
         skills: ["Prompt chaining", "XML structure", "System prompts"],
@@ -798,7 +799,7 @@ export default function ClaudeLearningPlan2BaseFirebase() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <h1 style={{ fontSize: 26, fontWeight: 600, margin: "0 0 6px", letterSpacing: -0.5 }}>Claude Mastery for 2Base</h1>
-            <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: 0, fontWeight: 400 }}>Master Claude for daily workflows and strategic decisions</p>
+            <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: 0, fontWeight: 400 }}>Self-paced · BA · QA · Delivery · P&C · DevSecOps</p>
           </div>
           <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <ProgressRing percent={overallPercent} size={56} stroke={5} color="#2EAD6B" />
