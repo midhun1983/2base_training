@@ -5,12 +5,12 @@ import { getFirestore, doc, setDoc, getDoc, collection, query, getDocs, onSnapsh
 
 // Firebase configuration - REPLACE WITH YOUR PROJECT VALUES
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDimpt1Jn0u-_Au8LZoj8jDLeVGidolsfU",
+  authDomain: "bs-training.firebaseapp.com",
+  projectId: "bs-training",
+  storageBucket: "bs-training.firebasestorage.app",
+  messagingSenderId: "197780060874",
+  appId: "1:197780060874:web:8771b5b465c2733b8f5233"
 };
 
 // Initialize Firebase
@@ -19,7 +19,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // Optional: Restrict to company domain only
-const ALLOWED_DOMAIN = "2base.tech"; // Change to your company domain, or set to null to allow all
+const ALLOWED_DOMAIN = "2basetechnologies.com"; // Change to your company domain, or set to null to allow all
 
 const DAYS = [
   {
