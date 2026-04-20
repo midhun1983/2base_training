@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, collection, query, getDocs, onSnapshot } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc, collection, query, getDocs, deleteDoc } from "firebase/firestore";
 
 // Firebase configuration - REPLACE WITH YOUR PROJECT VALUES
 const firebaseConfig = {
@@ -19,7 +19,13 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // Optional: Restrict to company domain only
-const ALLOWED_DOMAIN = "2basetechnologies.com"; // Change to your company domain, or set to null to allow all
+const ALLOWED_DOMAIN = "2base.tech"; // Change to your company domain, or set to null to allow all
+
+// Admin emails - ONLY these users can access admin dashboard
+const ADMIN_EMAILS = [
+  "midhun@2basetechnologies.com",
+  // Add more admin emails here
+];
 
 const DAYS = [
   {
@@ -384,11 +390,14 @@ function LoginScreen({ onLogin }) {
   };
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f9f8f6", padding: 24 }}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f9f8f6", padding: 24, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
       <div style={{ maxWidth: 420, width: "100%", background: "#fff", borderRadius: 16, padding: "40px 32px", border: "1px solid #e5e3df", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <h1 style={{ fontSize: 28, fontWeight: 700, margin: "0 0 8px", color: "#1a1a1a" }}>Claude Mastery</h1>
-          <p style={{ fontSize: 15, color: "#666", margin: 0 }}>2Base Technologies Leadership Training</p>
+          {/* 2Base Logo Placeholder - Replace with actual logo */}
+          <div style={{ width: 80, height: 80, margin: "0 auto 20px", background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, fontWeight: 700, color: "#fff" }}>
+            2B
+          </div>
+          <h1 style={{ fontSize: 28, fontWeight: 600, margin: "0 0 8px", color: "#1a1a1a" }}>Claude Mastery for 2Base</h1>
         </div>
         
         <button onClick={handleGoogleSignIn} style={{ width: "100%", padding: "14px 20px", background: "#fff", border: "1px solid #dadce0", borderRadius: 8, fontSize: 15, fontWeight: 500, color: "#3c4043", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, transition: "all 0.2s" }}>
@@ -419,18 +428,18 @@ function SessionCard({ session, dayColor, progress, onToggleReading, onTogglePro
   const sessionPercent = Math.round(((doneReading + (wp.projectDone ? 1 : 0)) / (totalReading + 1)) * 100);
 
   return (
-    <div style={{ marginBottom: 18, background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
+    <div style={{ marginBottom: 18, background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
       <div onClick={onToggle} style={{ padding: "14px 18px", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, transition: "background 0.2s", background: isExpanded ? `${dayColor}08` : "transparent" }}>
         <div style={{ position: "relative", flexShrink: 0 }}>
           <ProgressRing percent={sessionPercent} size={40} stroke={4} color={dayColor} />
-          <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, fontFamily: "'DM Mono', monospace", color: dayColor }}>{sessionPercent}%</span>
+          <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 600, color: dayColor }}>{sessionPercent}%</span>
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 2, display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 2, display: "flex", alignItems: "center", gap: 8 }}>
             <span>{session.title}</span>
-            {isDone && <span style={{ fontSize: 10, background: `${dayColor}20`, color: dayColor, padding: "2px 8px", borderRadius: 4, fontFamily: "'DM Mono', monospace" }}>COMPLETE</span>}
+            {isDone && <span style={{ fontSize: 10, background: `${dayColor}20`, color: dayColor, padding: "2px 8px", borderRadius: 4, fontWeight: 500 }}>COMPLETE</span>}
           </div>
-          <div style={{ fontSize: 12, color: "var(--text-secondary)", fontFamily: "'DM Mono', monospace" }}>{session.session === "morning" ? "Morning" : "Afternoon"} session · {totalReading} learning items · 1 hands-on project</div>
+          <div style={{ fontSize: 12, color: "var(--text-secondary)", fontWeight: 400 }}>{session.session === "morning" ? "Morning" : "Afternoon"} session · {totalReading} learning items · 1 hands-on project</div>
         </div>
         <span style={{ fontSize: 18, color: "var(--text-secondary)", transition: "transform 0.2s", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
       </div>
@@ -438,11 +447,11 @@ function SessionCard({ session, dayColor, progress, onToggleReading, onTogglePro
       {isExpanded && (
         <div style={{ padding: "0 18px 18px" }}>
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: "var(--text-secondary)", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>Learning Checklist ({doneReading}/{totalReading})</div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>Learning Checklist ({doneReading}/{totalReading})</div>
             {session.reading.map((r, i) => (
               <div key={i} style={{ marginBottom: 8, display: "flex", alignItems: "flex-start", gap: 10 }}>
                 <input type="checkbox" checked={wp.reading[i] || false} onChange={() => onToggleReading(i)} style={{ marginTop: 4, cursor: "pointer", width: 16, height: 16, accentColor: dayColor }} />
-                <div style={{ flex: 1, fontSize: 13, lineHeight: 1.6 }}>
+                <div style={{ flex: 1, fontSize: 13, lineHeight: 1.6, fontWeight: 400 }}>
                   {r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: dayColor, textDecoration: "none", borderBottom: `1px dotted ${dayColor}` }}>{r.text}</a> : r.text}
                 </div>
               </div>
@@ -452,17 +461,17 @@ function SessionCard({ session, dayColor, progress, onToggleReading, onTogglePro
           <div style={{ marginBottom: 16, padding: 14, background: `${dayColor}08`, border: `1px dashed ${dayColor}40`, borderRadius: 8 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
               <input type="checkbox" checked={wp.projectDone || false} onChange={onToggleProject} style={{ cursor: "pointer", width: 18, height: 18, accentColor: dayColor }} />
-              <div style={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: dayColor, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>Hands-On Project</div>
+              <div style={{ fontSize: 11, color: dayColor, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>Hands-On Project</div>
             </div>
-            <div style={{ fontSize: 13, lineHeight: 1.6, paddingLeft: 28 }}>{session.project}</div>
+            <div style={{ fontSize: 13, lineHeight: 1.6, paddingLeft: 28, fontWeight: 400 }}>{session.project}</div>
           </div>
 
           <div>
-            <div style={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: "var(--text-secondary)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Session Notes</div>
-            <textarea value={wp.notes || ""} onChange={(e) => onAddNote(e.target.value)} placeholder="Capture key takeaways, experiments, questions, or deliverable links..." style={{ width: "100%", minHeight: 80, padding: 10, fontSize: 13, fontFamily: "inherit", lineHeight: 1.6, border: "1px solid var(--border)", borderRadius: 6, resize: "vertical", background: "var(--card-bg)", color: "var(--text)" }} />
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Session Notes</div>
+            <textarea value={wp.notes || ""} onChange={(e) => onAddNote(e.target.value)} placeholder="Capture key takeaways, experiments, questions, or deliverable links..." style={{ width: "100%", minHeight: 80, padding: 10, fontSize: 13, lineHeight: 1.6, border: "1px solid var(--border)", borderRadius: 6, resize: "vertical", background: "var(--card-bg)", color: "var(--text)", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }} />
           </div>
 
-          <div style={{ marginTop: 12, fontSize: 11, color: "var(--text-secondary)", fontFamily: "'DM Mono', monospace" }}>
+          <div style={{ marginTop: 12, fontSize: 11, color: "var(--text-secondary)", fontWeight: 400 }}>
             <strong>Skills Built:</strong> {session.skills.join(", ")}
           </div>
         </div>
@@ -471,11 +480,16 @@ function SessionCard({ session, dayColor, progress, onToggleReading, onTogglePro
   );
 }
 
-function AdminDashboard({ onBack }) {
+function AdminDashboard({ onBack, currentUser }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Check if current user is admin
+  const isAdmin = ADMIN_EMAILS.includes(currentUser.email);
+
   useEffect(() => {
+    if (!isAdmin) return;
+    
     const loadUsers = async () => {
       try {
         const usersRef = collection(db, "users");
@@ -517,40 +531,80 @@ function AdminDashboard({ onBack }) {
     };
     
     loadUsers();
-  }, []);
+  }, [isAdmin]);
+
+  const resetUserProgress = async (userId) => {
+    if (!confirm("Reset this user's progress? This cannot be undone.")) return;
+    
+    try {
+      await setDoc(doc(db, "users", userId), {
+        progress: {},
+        lastActive: new Date()
+      }, { merge: true });
+      
+      // Reload users
+      window.location.reload();
+    } catch (err) {
+      alert("Error resetting progress: " + err.message);
+    }
+  };
+
+  const deleteUser = async (userId, userEmail) => {
+    if (!confirm(`Delete user ${userEmail}? They can rejoin later. This cannot be undone.`)) return;
+    
+    try {
+      await deleteDoc(doc(db, "users", userId));
+      // Reload users
+      window.location.reload();
+    } catch (err) {
+      alert("Error deleting user: " + err.message);
+    }
+  };
+
+  if (!isAdmin) {
+    return (
+      <div style={{ maxWidth: 720, margin: "0 auto", padding: "24px 16px", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", textAlign: "center" }}>
+        <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 12 }}>Access Denied</h1>
+        <p style={{ color: "#666", marginBottom: 24 }}>You don't have admin permissions.</p>
+        <button onClick={onBack} style={{ padding: "10px 20px", background: "#2EAD6B", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: "pointer" }}>
+          Back to Training
+        </button>
+      </div>
+    );
+  }
 
   const avgProgress = users.length > 0 ? Math.round(users.reduce((s, u) => s + u.progress, 0) / users.length) : 0;
   const completedUsers = users.filter(u => u.progress === 100).length;
 
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 16px", fontFamily: "'Source Serif 4', Georgia, serif" }}>
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 16px", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         @media (prefers-color-scheme: dark) { :root { --text: #e8e6e1; --text-secondary: #a8a5a0; --card-bg: #1e1e1c; --border: #333330; } }
       `}</style>
       
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 26, fontWeight: 700, margin: "0 0 6px", color: "var(--text)" }}>Admin Dashboard</h1>
-          <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: 0, fontFamily: "'DM Mono', monospace" }}>Team progress overview · real-time sync</p>
+          <h1 style={{ fontSize: 26, fontWeight: 600, margin: "0 0 6px", color: "var(--text)" }}>Admin Dashboard</h1>
+          <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: 0, fontWeight: 400 }}>Team progress overview · real-time sync</p>
         </div>
-        <button onClick={onBack} style={{ padding: "10px 20px", background: "#2EAD6B", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Mono', monospace" }}>
+        <button onClick={onBack} style={{ padding: "10px 20px", background: "#2EAD6B", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: "pointer" }}>
           Back to Training
         </button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 32 }}>
         <div style={{ padding: "20px 24px", background: "var(--card-bg)", borderRadius: 10, border: "1px solid var(--border)" }}>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "#2EAD6B", marginBottom: 4 }}>{users.length}</div>
-          <div style={{ fontSize: 13, color: "var(--text-secondary)", fontFamily: "'DM Mono', monospace" }}>Active Participants</div>
+          <div style={{ fontSize: 32, fontWeight: 600, color: "#2EAD6B", marginBottom: 4 }}>{users.length}</div>
+          <div style={{ fontSize: 13, color: "var(--text-secondary)", fontWeight: 400 }}>Active Participants</div>
         </div>
         <div style={{ padding: "20px 24px", background: "var(--card-bg)", borderRadius: 10, border: "1px solid var(--border)" }}>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "#3A7BE8", marginBottom: 4 }}>{avgProgress}%</div>
-          <div style={{ fontSize: 13, color: "var(--text-secondary)", fontFamily: "'DM Mono', monospace" }}>Average Progress</div>
+          <div style={{ fontSize: 32, fontWeight: 600, color: "#3A7BE8", marginBottom: 4 }}>{avgProgress}%</div>
+          <div style={{ fontSize: 13, color: "var(--text-secondary)", fontWeight: 400 }}>Average Progress</div>
         </div>
         <div style={{ padding: "20px 24px", background: "var(--card-bg)", borderRadius: 10, border: "1px solid var(--border)" }}>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "#9B59B6", marginBottom: 4 }}>{completedUsers}</div>
-          <div style={{ fontSize: 13, color: "var(--text-secondary)", fontFamily: "'DM Mono', monospace" }}>Completed Program</div>
+          <div style={{ fontSize: 32, fontWeight: 600, color: "#9B59B6", marginBottom: 4 }}>{completedUsers}</div>
+          <div style={{ fontSize: 13, color: "var(--text-secondary)", fontWeight: 400 }}>Completed Program</div>
         </div>
       </div>
 
@@ -561,32 +615,41 @@ function AdminDashboard({ onBack }) {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "#f9f8f6", borderBottom: "1px solid var(--border)" }}>
-                <th style={{ padding: "14px 18px", textAlign: "left", fontSize: 12, fontWeight: 700, fontFamily: "'DM Mono', monospace", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>Participant</th>
-                <th style={{ padding: "14px 18px", textAlign: "center", fontSize: 12, fontWeight: 700, fontFamily: "'DM Mono', monospace", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>Progress</th>
-                <th style={{ padding: "14px 18px", textAlign: "center", fontSize: 12, fontWeight: 700, fontFamily: "'DM Mono', monospace", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>Sessions</th>
-                <th style={{ padding: "14px 18px", textAlign: "right", fontSize: 12, fontWeight: 700, fontFamily: "'DM Mono', monospace", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>Last Active</th>
+                <th style={{ padding: "14px 18px", textAlign: "left", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>Participant</th>
+                <th style={{ padding: "14px 18px", textAlign: "center", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>Progress</th>
+                <th style={{ padding: "14px 18px", textAlign: "center", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>Sessions</th>
+                <th style={{ padding: "14px 18px", textAlign: "right", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>Last Active</th>
+                <th style={{ padding: "14px 18px", textAlign: "right", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {users.map((user, i) => (
                 <tr key={user.id} style={{ borderBottom: i < users.length - 1 ? "1px solid var(--border)" : "none" }}>
                   <td style={{ padding: "16px 18px" }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 2, color: "var(--text)" }}>{user.name}</div>
-                    <div style={{ fontSize: 12, color: "var(--text-secondary)", fontFamily: "'DM Mono', monospace" }}>{user.email}</div>
+                    <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 2, color: "var(--text)" }}>{user.name}</div>
+                    <div style={{ fontSize: 12, color: "var(--text-secondary)", fontWeight: 400 }}>{user.email}</div>
                   </td>
                   <td style={{ padding: "16px 18px", textAlign: "center" }}>
                     <div style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
                       <div style={{ width: 100, height: 6, background: "#e5e3df", borderRadius: 3, overflow: "hidden" }}>
                         <div style={{ width: `${user.progress}%`, height: "100%", background: user.progress === 100 ? "#2EAD6B" : "#3A7BE8", transition: "width 0.3s ease" }} />
                       </div>
-                      <span style={{ fontSize: 13, fontWeight: 700, fontFamily: "'DM Mono', monospace", color: user.progress === 100 ? "#2EAD6B" : "var(--text)" }}>{user.progress}%</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: user.progress === 100 ? "#2EAD6B" : "var(--text)" }}>{user.progress}%</span>
                     </div>
                   </td>
                   <td style={{ padding: "16px 18px", textAlign: "center" }}>
-                    <span style={{ fontSize: 14, fontWeight: 600, fontFamily: "'DM Mono', monospace", color: "var(--text)" }}>{user.sessionsComplete}/{ALL_SESSIONS.length}</span>
+                    <span style={{ fontSize: 14, fontWeight: 500, color: "var(--text)" }}>{user.sessionsComplete}/{ALL_SESSIONS.length}</span>
                   </td>
-                  <td style={{ padding: "16px 18px", textAlign: "right", fontSize: 12, color: "var(--text-secondary)", fontFamily: "'DM Mono', monospace" }}>
+                  <td style={{ padding: "16px 18px", textAlign: "right", fontSize: 12, color: "var(--text-secondary)", fontWeight: 400 }}>
                     {user.lastActive.toLocaleDateString()}
+                  </td>
+                  <td style={{ padding: "16px 18px", textAlign: "right" }}>
+                    <button onClick={() => resetUserProgress(user.id)} style={{ padding: "6px 12px", fontSize: 12, fontWeight: 500, background: "#FFA500", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer", marginRight: 8 }}>
+                      Reset
+                    </button>
+                    <button onClick={() => deleteUser(user.id, user.email)} style={{ padding: "6px 12px", fontSize: 12, fontWeight: 500, background: "#C0392B", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer" }}>
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -605,6 +668,8 @@ export default function ClaudeLearningPlan2BaseFirebase() {
   const [expandedDay, setExpandedDay] = useState(0);
   const [expandedSessions, setExpandedSessions] = useState({});
   const [progress, setProgress] = useState({});
+
+  const isAdmin = user && ADMIN_EMAILS.includes(user.email);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -711,7 +776,7 @@ export default function ClaudeLearningPlan2BaseFirebase() {
   };
 
   if (loading) {
-    return <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", fontFamily: "'DM Mono', monospace", color: "#888" }}>Loading...</div>;
+    return <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "#888" }}>Loading...</div>;
   }
 
   if (!user) {
@@ -719,56 +784,58 @@ export default function ClaudeLearningPlan2BaseFirebase() {
   }
 
   if (showAdmin) {
-    return <AdminDashboard onBack={() => setShowAdmin(false)} />;
+    return <AdminDashboard onBack={() => setShowAdmin(false)} currentUser={user} />;
   }
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: "24px 16px", fontFamily: "'Source Serif 4', Georgia, serif", color: "var(--text)", "--text": "#1a1a1a", "--text-secondary": "#555", "--card-bg": "#fafaf8", "--border": "#e5e3df" }}>
+    <div style={{ maxWidth: 720, margin: "0 auto", padding: "24px 16px", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text)", "--text": "#1a1a1a", "--text-secondary": "#555", "--card-bg": "#fafaf8", "--border": "#e5e3df" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         @media (prefers-color-scheme: dark) { :root { --text: #e8e6e1; --text-secondary: #a8a5a0; --card-bg: #1e1e1c; --border: #333330; } }
       `}</style>
 
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
-            <h1 style={{ fontSize: 26, fontWeight: 700, margin: "0 0 6px", letterSpacing: -0.5 }}>Claude Mastery for 2Base Leadership</h1>
-            <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: 0, fontFamily: "'DM Mono', monospace" }}>10 days · intensive · BA · QA · Delivery · P&C · DevSecOps</p>
+            <h1 style={{ fontSize: 26, fontWeight: 600, margin: "0 0 6px", letterSpacing: -0.5 }}>Claude Mastery for 2Base</h1>
+            <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: 0, fontWeight: 400 }}>Self-paced · BA · QA · Delivery · P&C · DevSecOps</p>
           </div>
           <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <ProgressRing percent={overallPercent} size={56} stroke={5} color="#2EAD6B" />
-            <span style={{ position: "absolute", fontSize: 13, fontWeight: 700, fontFamily: "'DM Mono', monospace", color: "#2EAD6B" }}>{overallPercent}%</span>
+            <span style={{ position: "absolute", fontSize: 13, fontWeight: 600, color: "#2EAD6B" }}>{overallPercent}%</span>
           </div>
         </div>
         
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 14, padding: "10px 16px", background: "#f0f8ff", borderRadius: 8, border: "1px solid #d1e7ff" }}>
-          <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#3A7BE8", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700 }}>
+          <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#3A7BE8", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 600 }}>
             {user.displayName?.[0] || user.email[0].toUpperCase()}
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 600 }}>{user.displayName || user.email.split('@')[0]}</div>
-            <div style={{ fontSize: 11, color: "#666", fontFamily: "'DM Mono', monospace" }}>{user.email}</div>
+            <div style={{ fontSize: 13, fontWeight: 500 }}>{user.displayName || user.email.split('@')[0]}</div>
+            <div style={{ fontSize: 11, color: "#666", fontWeight: 400 }}>{user.email}</div>
           </div>
-          <button onClick={() => setShowAdmin(true)} style={{ padding: "6px 14px", background: "#fff", border: "1px solid #dadce0", borderRadius: 6, fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Mono', monospace" }}>
-            Admin
-          </button>
-          <button onClick={handleSignOut} style={{ padding: "6px 14px", background: "#fff", border: "1px solid #dadce0", borderRadius: 6, fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Mono', monospace" }}>
+          {isAdmin && (
+            <button onClick={() => setShowAdmin(true)} style={{ padding: "6px 14px", background: "#fff", border: "1px solid #dadce0", borderRadius: 6, fontSize: 12, fontWeight: 500, cursor: "pointer" }}>
+              Admin
+            </button>
+          )}
+          <button onClick={handleSignOut} style={{ padding: "6px 14px", background: "#fff", border: "1px solid #dadce0", borderRadius: 6, fontSize: 12, fontWeight: 500, cursor: "pointer" }}>
             Sign Out
           </button>
         </div>
 
         <div style={{ display: "flex", gap: 16, marginTop: 14, padding: "12px 16px", background: "var(--card-bg)", borderRadius: 10, border: "1px solid var(--border)" }}>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 20, fontWeight: 700 }}>{sessionsCompleted}</div>
-            <div style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "'DM Mono', monospace" }}>of {ALL_SESSIONS.length} sessions</div>
+            <div style={{ fontSize: 20, fontWeight: 600 }}>{sessionsCompleted}</div>
+            <div style={{ fontSize: 11, color: "var(--text-secondary)", fontWeight: 400 }}>of {ALL_SESSIONS.length} sessions</div>
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 20, fontWeight: 700 }}>{doneItems}</div>
-            <div style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "'DM Mono', monospace" }}>of {totalItems} items</div>
+            <div style={{ fontSize: 20, fontWeight: 600 }}>{doneItems}</div>
+            <div style={{ fontSize: 11, color: "var(--text-secondary)", fontWeight: 400 }}>of {totalItems} items</div>
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 20, fontWeight: 700 }}>{DAYS.length}</div>
-            <div style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "'DM Mono', monospace" }}>intensive days</div>
+            <div style={{ fontSize: 20, fontWeight: 600 }}>{DAYS.length}</div>
+            <div style={{ fontSize: 11, color: "var(--text-secondary)", fontWeight: 400 }}>learning days</div>
           </div>
         </div>
       </div>
@@ -777,7 +844,7 @@ export default function ClaudeLearningPlan2BaseFirebase() {
         {DAYS.map((d, i) => {
           const dp = getDayPercent(d);
           return (
-            <button key={i} onClick={() => setExpandedDay(i)} style={{ flex: "1 1 calc(20% - 6px)", minWidth: 68, padding: "10px 6px 12px", background: expandedDay === i ? d.color : `${d.color}15`, color: expandedDay === i ? "#fff" : d.color, border: "none", borderRadius: 8, cursor: "pointer", fontSize: 11, fontWeight: 700, fontFamily: "'DM Mono', monospace", transition: "all 0.2s", position: "relative", overflow: "hidden" }}>
+            <button key={i} onClick={() => setExpandedDay(i)} style={{ flex: "1 1 calc(20% - 6px)", minWidth: 68, padding: "10px 6px 12px", background: expandedDay === i ? d.color : `${d.color}15`, color: expandedDay === i ? "#fff" : d.color, border: "none", borderRadius: 8, cursor: "pointer", fontSize: 11, fontWeight: 600, transition: "all 0.2s", position: "relative", overflow: "hidden" }}>
               <div>Day {d.day}</div>
               <div style={{ fontSize: 9, opacity: 0.8, marginTop: 2 }}>{dp}%</div>
               <div style={{ position: "absolute", bottom: 0, left: 0, height: 3, width: `${dp}%`, background: expandedDay === i ? "#fff" : d.color, opacity: 0.6, borderRadius: "0 2px 0 0", transition: "width 0.4s ease" }} />
@@ -790,11 +857,11 @@ export default function ClaudeLearningPlan2BaseFirebase() {
         <div key={i}>
           <div style={{ marginBottom: 18 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-              <span style={{ fontSize: 12, fontFamily: "'DM Mono', monospace", color: d.color, fontWeight: 700 }}>DAY {d.day}</span>
-              <span style={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: "var(--text-secondary)" }}>{getDayPercent(d)}% complete</span>
+              <span style={{ fontSize: 12, color: d.color, fontWeight: 600 }}>DAY {d.day}</span>
+              <span style={{ fontSize: 11, color: "var(--text-secondary)", fontWeight: 400 }}>{getDayPercent(d)}% complete</span>
             </div>
-            <h2 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 2px" }}>{d.title}</h2>
-            <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: 0, fontStyle: "italic" }}>{d.subtitle}</p>
+            <h2 style={{ fontSize: 22, fontWeight: 600, margin: "0 0 2px" }}>{d.title}</h2>
+            <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: 0, fontStyle: "italic", fontWeight: 400 }}>{d.subtitle}</p>
           </div>
           {d.sessions.map((s) => {
             const key = `${d.day}-${s.session}`;
@@ -805,8 +872,8 @@ export default function ClaudeLearningPlan2BaseFirebase() {
         </div>
       ))}
 
-      <div style={{ marginTop: 24, padding: "14px 18px", background: "var(--card-bg)", borderRadius: 10, border: "1px solid var(--border)", fontSize: 13, lineHeight: 1.7, color: "var(--text-secondary)" }}>
-        <strong style={{ color: "var(--text)" }}>Progress syncs automatically.</strong> Your progress is saved to the cloud in real-time and accessible from any device. Signed in as {user.email}.
+      <div style={{ marginTop: 24, padding: "14px 18px", background: "var(--card-bg)", borderRadius: 10, border: "1px solid var(--border)", fontSize: 13, lineHeight: 1.7, color: "var(--text-secondary)", fontWeight: 400 }}>
+        <strong style={{ color: "var(--text)", fontWeight: 500 }}>Progress syncs automatically.</strong> Your progress is saved to the cloud in real-time and accessible from any device. Signed in as {user.email}.
       </div>
     </div>
   );
