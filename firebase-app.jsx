@@ -19,7 +19,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // Optional: Restrict to company domain only
-const ALLOWED_DOMAIN = "2base.tech"; // Change to your company domain, or set to null to allow all
+const ALLOWED_DOMAIN = "2basetechnologies.com"; // Change to your company domain, or set to null to allow all
 
 // Admin emails - ONLY these users can access admin dashboard
 const ADMIN_EMAILS = [
